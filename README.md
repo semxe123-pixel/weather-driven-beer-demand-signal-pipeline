@@ -51,18 +51,18 @@ Processed Layer
  ├─ search_interest_daily.csv
  └─ weather_daily.csv
           ↓
-Transformation / Mart Creation
+Demand Signal Mart
  └─ demand_signal_daily.csv
           ↓
-MySQL
- └─ demand_signal_daily table
-          ↓
-SQL Aggregation & Analysis
- └─ a/b/c analysis queries
-          ↓
-Visualization & Reporting
- └─ figures (charts & insights)
+Downstream Consumers
+ ├─ SQL-Based Analysis (MySQL, A/B/C queries)
+ │    └─ Result Marts (CSV)
+ └─ Visualization & Reporting
+      └─ Figures & Insights
 ```
+The Demand Signal Mart serves as the single source of truth,
+with SQL-based analysis and visualization acting as independent downstream consumers.
+
 ---
 
 ## 🛠 3. Key Engineering Features
@@ -153,8 +153,27 @@ short-term demand responses.
 - Insight: Temperature change acts as a short-term demand accelerator
 
 ---
+## 🧮 5. SQL-Based Analysis
 
-## 🚀 5. How to Run
+All analytical aggregations are performed using SQL on top of the
+`demand_signal_daily` mart stored in MySQL.
+
+The SQL queries are stored as executable scripts under the `sql/` directory
+and are designed to generate reusable analytical result datasets.
+
+### SQL Scripts Overview
+
+| File | Description | Output |
+|-----|------------|--------|
+| `01_temp_bin_analysis.sql` | Average beer search interest by temperature range | `beer_search_by_temp_bin.csv` |
+| `02_weekday_analysis.sql` | Weekday vs weekend demand comparison | `beer_search_by_weekday.csv` |
+| `03_temp_weekend_interaction.sql` | Temperature × weekend interaction analysis | `beer_search_temp_weekend_effect.csv` |
+
+Each query focuses on aggregation logic rather than data preparation,
+which is handled upstream in the ETL pipeline.
+
+
+## 🚀 6. How to Run
 
 This project is implemented as a batch-style ETL pipeline.
 By running each script in order, data ingestion, transformation, and analysis
